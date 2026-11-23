@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Étiquettes - Carnet Noir</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Metal+Mania&family=Eater&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #4d4d4d 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 40px;
+            font-style: italic;
+            color: #ccc;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+        }
+
+        input[type="file"] {
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: #333;
+            color: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #ff69b4;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .color-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .color-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .color-option.selected {
+            border-color: #fff;
+            transform: scale(1.05);
+        }
+
+        .preview-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #preview {
+            display: inline-block;
+            margin: 20px auto;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect width="10" height="10" fill="%23ccc"/><rect x="10" y="10" width="10" height="10" fill="%23ccc"/><rect x="10" width="10" height="10" fill="%23999"/><rect y="10" width="10" height="10" fill="%23999"/></svg>');
+            background-size: 20px 20px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: #fff;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.5);
+        }
+
+        .reset-btn {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .clear-bg-btn {
+            background: rgba(255,100,100,0.3);
+            color: #fff;
+        }
+
+        .clear-bg-btn:hover {
+            background: rgba(255,100,100,0.5);
+        }
+
+        canvas {
+            border-radius: 10px;
+        }
+
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #ccc;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖤 Générateur d'Étiquettes 🖤</h1>
+        <p class="subtitle">Simple & Élégant</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>📝 Texte :</label>
+                <input type="text" id="labelText" value="CARNET NOIR" placeholder="Écris ton texte...">
+            </div>
+
+            <div class="control-group">
+                <label>🎭 Style de police :</label>
+                <select id="fontStyle">
+                    <option value="Georgia">Classique (Georgia)</option>
+                    <option value="Metal Mania" selected>Gothic Metal</option>
+                    <option value="Creepster">Horror Gothic</option>
+                    <option value="Nosifer">Dark Gothic</option>
+                    <option value="Eater">Rough Gothic</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>🎨 Couleur du cadre :</label>
+                <div class="color-selector" id="colorSelector"></div>
+            </div>
+
+            <div class="control-group">
+                <label>🖼️ Fond personnalisé (optionnel) :</label>
+                <input type="file" id="backgroundUpload" accept="image/*">
+                <button class="clear-bg-btn" onclick="clearBackground()" style="margin-top: 10px; width: auto; padding: 10px 20px; font-size: 0.9em;">❌ Retirer le fond</button>
+            </div>
+
+            <div class="control-group">
+                <label>📏 Taille de l'étiquette :</label>
+                <input type="number" id="sizeSlider" min="300" max="800" value="500" step="50">
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <h3 style="margin-bottom: 20px;">👁️ Aperçu</h3>
+            <p style="font-size: 0.9em; color: #ccc; margin-bottom: 15px;">Le fond quadrillé montre la transparence</p>
+            <div id="preview">
+                <canvas id="labelCanvas"></canvas>
+            </div>
+            <div class="button-group">
+                <button class="download-btn" onclick="downloadLabel()">💾 Télécharger PNG</button>
+                <button class="reset-btn" onclick="resetSettings()">🔄 Réinitialiser</button>
+            </div>
+            <p class="info">✨ Fond personnalisable, transparent à l'extérieur ✨</p>
+        </div>
+    </div>
+
+    <script>
+        const colors = [
+            { name: 'Noir', value: '#1a1a1a' },
+            { name: 'Rose', value: '#ff69b4' },
+            { name: 'Violet', value: '#9370db' },
+            { name: 'Bleu Azur', value: '#00bfff' },
+            { name: 'Rouge', value: '#dc143c' },
+            { name: 'Vert', value: '#50c878' },
+            { name: 'Orange', value: '#ff8c00' },
+            { name: 'Bordeaux', value: '#722f37' }
+        ];
+
+        let selectedColor = colors[0].value;
+        let backgroundImage = null;
+        const canvas = document.getElementById('labelCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Créer les options de couleur
+        const colorSelector = document.getElementById('colorSelector');
+        colors.forEach(color => {
+            const div = document.createElement('div');
+            div.className = 'color-option' + (color.value === selectedColor ? ' selected' : '');
+            div.style.backgroundColor = color.value;
+            div.textContent = color.name;
+            const darkColors = ['#1a1a1a', '#8b0000', '#722f37', '#dc143c'];
+            div.style.color = darkColors.includes(color.value) ? '#fff' : '#000';
+            div.onclick = () => selectColor(color.value, div);
+            colorSelector.appendChild(div);
+        });
+
+        function selectColor(color, element) {
+            selectedColor = color;
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            drawLabel();
+        }
+
+        // Gestion de l'upload de fond
+        document.getElementById('backgroundUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        backgroundImage = img;
+                        drawLabel();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function clearBackground() {
+            backgroundImage = null;
+            document.getElementById('backgroundUpload').value = '';
+            drawLabel();
+        }
+
+        function drawLabel() {
+            const size = parseInt(document.getElementById('sizeSlider').value);
+            const text = document.getElementById('labelText').value;
+            const fontStyle = document.getElementById('fontStyle').value;
+
+            canvas.width = size;
+            canvas.height = size * 0.6;
+
+            const padding = 20;
+            const borderWidth = 8;
+
+            // Fond complètement transparent
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Si un fond personnalisé est chargé, le dessiner
+            if (backgroundImage) {
+                ctx.save();
+                // Créer un chemin de découpe pour la forme ondulée
+                drawWavyShape(ctx, padding, padding, canvas.width - padding * 2, canvas.height - padding * 2, borderWidth);
+                ctx.clip();
+                
+                // Dessiner l'image de fond en la redimensionnant pour remplir la forme
+                ctx.drawImage(backgroundImage, padding, padding, canvas.width - padding * 2, canvas.height - padding * 2);
+                ctx.restore();
+            } else {
+                // Sinon, dessiner le fond blanc
+                ctx.fillStyle = '#ffffff';
+                drawWavyShape(ctx, padding, padding, canvas.width - padding * 2, canvas.height - padding * 2, borderWidth);
+                ctx.fill();
+            }
+
+            // Dessiner le cadre ondulé coloré
+            ctx.strokeStyle = selectedColor;
+            ctx.lineWidth = borderWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            drawWavyShape(ctx, padding, padding, canvas.width - padding * 2, canvas.height - padding * 2, borderWidth);
+            ctx.stroke();
+
+            // Dessiner le texte centré
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = `bold ${size * 0.1}px ${fontStyle}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        }
+
+        function drawWavyShape(ctx, x, y, width, height, borderWidth) {
+            const amplitude = 8;
+            const frequency = 0.5;
+            const segments = 40;
+            
+            ctx.beginPath();
+            
+            // Haut (gauche vers droite)
+            const topStep = width / segments;
+            for (let i = 0; i <= segments; i++) {
+                const px = x + i * topStep;
+                const py = y + Math.sin(i * frequency) * amplitude;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            
+            // Droite (haut vers bas)
+            const rightSegments = 30;
+            const rightStep = height / rightSegments;
+            for (let i = 1; i <= rightSegments; i++) {
+                const px = x + width + Math.sin(i * frequency + 2) * amplitude;
+                const py = y + i * rightStep;
+                ctx.lineTo(px, py);
+            }
+            
+            // Bas (droite vers gauche)
+            for (let i = segments; i >= 0; i--) {
+                const px = x + i * topStep;
+                const py = y + height + Math.sin(i * frequency + 3) * amplitude;
+                ctx.lineTo(px, py);
+            }
+            
+            // Gauche (bas vers haut)
+            for (let i = rightSegments; i >= 0; i--) {
+                const px = x + Math.sin(i * frequency) * amplitude;
+                const py = y + i * rightStep;
+                ctx.lineTo(px, py);
+            }
+            
+            ctx.closePath();
+        }
+
+        function downloadLabel() {
+            const link = document.createElement('a');
+            link.download = 'etiquette_carnet_noir.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function resetSettings() {
+            document.getElementById('labelText').value = 'CARNET NOIR';
+            document.getElementById('sizeSlider').value = 500;
+            document.getElementById('fontStyle').value = 'Metal Mania';
+            selectedColor = colors[0].value;
+            backgroundImage = null;
+            document.getElementById('backgroundUpload').value = '';
+            document.querySelectorAll('.color-option').forEach((el, i) => {
+                el.classList.toggle('selected', i === 0);
+            });
+            drawLabel();
+        }
+
+        // Event listeners
+        document.getElementById('labelText').addEventListener('input', drawLabel);
+        document.getElementById('sizeSlider').addEventListener('input', drawLabel);
+        document.getElementById('fontStyle').addEventListener('change', drawLabel);
+
+        // Dessiner l'étiquette initiale
+        setTimeout(drawLabel, 100);
+    </script>
+</body>
+</html>
